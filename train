@@ -1,0 +1,62 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data=pd.read_csv('heart.csv')
+o2=pd.read_csv('o2Saturation.csv')
+
+print(data.head())
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(data.corr(), annot=True)
+plt.show()
+
+
+def show_data(chunk):
+    #fig = plt.figure(figsize=(8, 6))
+    #fig.subplots_adjust(hspace=0.4, wspace=0.4)
+    #ax = fig.add_subplot(3, 3, 1)
+    sns.distplot(chunk, hist_kws=dict(edgecolor='k', linewidth=1), bins=10)
+    plt.show()
+    return 0
+#print(data.isna().sum())
+for i in range(len(data.columns)):
+    break
+    show_data(data[f'{data.columns[i]}'])
+
+print(data.duplicated().sum())
+data.drop_duplicates(inplace=True)
+data.reset_index(inplace=True,drop=True)
+
+Y=data['output']
+X=data.drop(labels=['output'],axis=1)
+
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
+
+X_train, X_test, y_train, y_test=train_test_split(X,Y,test_size=0.2,shuffle=True,random_state=0)
+#print(X_train,y_train)
+sc=StandardScaler()
+X_train=sc.fit_transform(X_train)
+X_test=sc.fit_transform(X_test)
+#print(X_train,y_train)
+
+from catboost import CatBoostClassifier,CatBoostRegressor
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+
+model=KNeighborsClassifier()
+
+model.fit(X_train,y_train)
+
+from sklearn.metrics import accuracy_score
+
+prediction=model.predict(X_test)
+pred_train=model.predict(X_train)
+
+print(accuracy_score(y_test,prediction))
+print(accuracy_score(y_train,pred_train))
